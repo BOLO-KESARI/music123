@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+
+{% block title %}Raga-Thaat Mapping{% endblock %}
+
+{% block content %}
+    <div class="content-section">
+        <h1 class="section-title">🎶 Raga-Thaat Mapping and Insights</h1>
+        <p class="section-description">
+            Explore ragas and their corresponding thaats, along with emotional impacts and other details.
+            Select a raga to discover its associated thaat and detailed insights.
+        </p>
+
+        <form method="POST" action="{{ url_for('thaat_mapping') }}" class="select-form">
+            <label for="selected_raga">Select a Raga 🏷️:</label>
+            <select name="selected_raga" id="selected_raga" onchange="this.form.submit()">
+                <option value="">-- Select a Raga --</option>
+                {% for raga_name in ragas_for_select %}
+                    <option value="{{ raga_name }}" {% if selected_raga == raga_name %}selected{% endif %}>{{ raga_name }}</option>
+                {% endfor %}
+            </select>
+        </form>
+
+        {% if selected_raga %}
+            <div class="result-card">
+                {% if associated_thaat %}
+                    <h3 class="result-title">🎵 <strong>{{ selected_raga }}</strong> belongs to the <strong>{{ associated_thaat }} Thaat</strong> 🎶</h3>
+                    {% if thaat_insights %}
+                        <p>{{ thaat_insights | nl2br }}</p>
+                    {% else %}
+                        <p class="error-message">No additional insights available for {{ selected_raga }} in {{ associated_thaat }} Thaat.</p>
+                    {% endif %}
+
+                    {% if other_ragas_in_thaat %}
+                        <h4 class="result-subtitle">🎼 Other Ragas in the Same Thaat:</h4>
+                        <p>{{ other_ragas_in_thaat | join(', ') }}</p>
+                    {% endif %}
+                {% else %}
+                    <p class="error-message">The selected raga does not belong to any defined thaat.</p>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <div class="expander-section">
+            <details>
+                <summary>📚 Learn More About Thaats and Their Ragas</summary>
+                <p>
+                    In Hindustani classical music, a thaat is a framework that organizes ragas based on shared characteristics.
+                    <ul>
+                        <li><strong>Raga</strong>: A melodic framework for improvisation and composition.</li>
+                        <li><strong>Thaat</strong>: A group of ragas sharing a common scale and emotional theme.</li>
+                        <li><strong>Emotional Impact</strong>: Each raga and thaat evokes specific emotions and moods.</li>
+                    </ul>
+                    Explore the depth and beauty of Indian classical music through its ragas and thaats.
+                </p>
+            </details>
+        </div>
+    </div>
+{% endblock %}

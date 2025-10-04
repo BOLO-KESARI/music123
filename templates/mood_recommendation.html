@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+
+{% block title %}Raga by Mood{% endblock %}
+
+{% block content %}
+    <div class="content-section">
+        <h1 class="section-title">Raga Recommendation by Mood 🎶</h1>
+        <p class="section-description">
+            Discover the perfect raga for your current emotional state.
+            Select a mood from the dropdown below to explore the ideal ragas that resonate with it.
+        </p>
+
+        <form method="POST" action="{{ url_for('mood_recommendation') }}" class="select-form">
+            <label for="selected_mood">Select your mood 😊:</label>
+            <select name="selected_mood" id="selected_mood" onchange="this.form.submit()">
+                <option value="">-- Select a Mood --</option>
+                {% for mood in moods %}
+                    <option value="{{ mood }}" {% if selected_mood == mood %}selected{% endif %}>{{ mood }}</option>
+                {% endfor %}
+            </select>
+        </form>
+
+        {% if selected_mood %}
+            <div class="result-card">
+                <h3 class="result-title">Recommended Ragas for <strong>{{ selected_mood }}</strong></h3>
+                {% if mood_features %}
+                    <p>{{ mood_features | nl2br }}</p>
+                {% endif %}
+
+                <h4 class="result-subtitle">Raga List</h4>
+                {% for raga in raga_details_list %}
+                    <details class="expander-item">
+                        <summary>🎵 {{ raga['name'] }}: {{ raga['description'] }}</summary>
+                        <p><a href="{{ raga['link'] }}" target="_blank">Listen to {{ raga['name'] }}</a></p>
+                        <p><strong>Details</strong>: {{ (raga['details'] if raga['details'] else 'No additional insights available.') | nl2br }}</p>
+                    </details>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

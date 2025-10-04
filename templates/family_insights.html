@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+
+{% block title %}Raga Family Insights{% endblock %}
+
+{% block content %}
+    <div class="content-section">
+        <h1 class="section-title">🎶 Raga Family Mapping and Insights</h1>
+        <p class="section-description">
+            Explore raga families and their corresponding ragas, along with emotional impacts and other details.
+            Select a raga family to discover its associated ragas and detailed insights.
+        </p>
+
+        <form method="POST" action="{{ url_for('family_insights') }}" class="select-form">
+            <label for="selected_family">Select a Raga Family:</label>
+            <select name="selected_family" id="selected_family" onchange="this.form.submit()">
+                <option value="">-- Select --</option>
+                {% for family in raga_families %}
+                    <option value="{{ family }}" {% if selected_family == family %}selected{% endif %}>{{ family }}</option>
+                {% endfor %}
+            </select>
+        </form>
+
+        {% if selected_family %}
+            <div class="result-card">
+                <h3 class="result-title">🎵 Ragas in the <strong>{{ selected_family }}</strong></h3>
+                <ul>
+                    {% for raga in associated_ragas %}
+                        <li>🌟 <strong>{{ raga }}</strong></li>
+                    {% endfor %}
+                </ul>
+
+                <h3 class="result-title">🌟 Insights for <strong>{{ selected_family }}</strong></h3>
+                {% if raga_family_details %}
+                    <p>{{ raga_family_details | nl2br }}</p>
+                {% else %}
+                    <p class="error-message">Could not fetch details for {{ selected_family }}. Please try again.</p>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <div class="expander-section">
+            <details>
+                <summary>📚 Learn More About Raga Families and Their Ragas</summary>
+                <p>
+                    In Hindustani classical music, ragas are grouped into families based on shared features such as scale, emotion, and performance time.
+                    Each raga family allows exploration of emotional depth within a framework while maintaining the uniqueness of each raga.
+                </p>
+            </details>
+        </div>
+
+        <div class="glossary-section">
+            <h3><strong>Glossary</strong></h3>
+            <ul>
+                <li><strong>Raga Family</strong>: A group of ragas sharing common characteristics.</li>
+                <li><strong>Raga</strong>: A melodic framework in Indian classical music with specific notes and improvisation rules.</li>
+                <li><strong>Thaat</strong>: The parent scale used to derive ragas.</li>
+                <li><strong>Ang</strong>: A characteristic style or feature used to classify ragas.</li>
+            </ul>
+        </div>
+    </div>
+{% endblock %}

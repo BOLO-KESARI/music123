@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block title %}General Raga Information{% endblock %}
+
+{% block content %}
+    <div class="content-section">
+        <h1 class="section-title">Explore Indian Ragas 🎶</h1>
+        <p class="section-description">
+            Explore the different Indian Ragas, their scales, family, time of performance, and other interesting details.
+            Select a Raga from the dropdown to learn more about it.
+        </p>
+
+        <form method="POST" action="{{ url_for('raga_info') }}" class="select-form">
+            <label for="selected_raga">Select a Raga:</label>
+            <select name="selected_raga" id="selected_raga" onchange="this.form.submit()">
+                <option value="">-- Choose a Raga --</option>
+                {% for raga_name in raga_names %}
+                    <option value="{{ raga_name }}" {% if selected_raga_name == raga_name %}selected{% endif %}>{{ raga_name }}</option>
+                {% endfor %}
+            </select>
+        </form>
+
+        {% if raga_details %}
+            <div class="result-card">
+                <h3 class="result-title">**{{ raga_details['Name'] }}**</h3>
+                <p><strong>Scale</strong>: {{ raga_details['Scale'] }}</p>
+                <p><strong>Thaat</strong>: {{ raga_details['Thaat'] }}</p>
+                <p><strong>Number of Notes</strong>: {{ raga_details['Number of Notes'] }}</p>
+                <p><strong>Family</strong>: {{ raga_details['Family'] }}</p>
+                <p><strong>Time of Performance</strong>: {{ raga_details['Time'] }}</p>
+            </div>
+        {% elif selected_raga_name %}
+            <p class="error-message">No details found for {{ selected_raga_name }}.</p>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "layout.html" %}
+
+{% block title %}Raga Information Finder{% endblock %}
+
+{% block content %}
+    <div class="content-section">
+        <h1 class="section-title">Raga Information Finder 🎵</h1>
+        <p class="section-description">
+            Welcome to the Raga Information Finder! Select a raga from the list to learn more about it.
+        </p>
+
+        <form method="POST" action="{{ url_for('raga_finder_by_name') }}" class="select-form">
+            <label for="selected_raga">Select a Raga 🔍</label>
+            <select name="selected_raga" id="selected_raga" onchange="this.form.submit()">
+                <option value="">-- Select a Raga --</option>
+                {% for raga_name in raga_names %}
+                    <option value="{{ raga_name }}" {% if selected_raga == raga_name %}selected{% endif %}>{{ raga_name }}</option>
+                {% endfor %}
+            </select>
+        </form>
+
+        {% if selected_raga %}
+            <div class="result-card">
+                <h3 class="result-title">You selected: <strong id="selected-raga-name">{{ selected_raga }}</strong></h3>
+                <hr>
+                <h3 class="result-title">Detailed Description for Raga: <span id="raga-title">{{ selected_raga }}</span></h3>
+                <div id="raga-description">
+                    <p class="section-description">Loading description...</p>
+                </div>
+            </div>
+            <script>
+                // Fetch the raga description as JSON and render it safely.
+                (function(){
+                    const raga = document.getElementById('selected-raga-name').innerText;
+                    const container = document.getElementById('raga-description');
+
+                    function escapeHtml(unsafe) {
+                        return unsafe
+                            .replace(/&/g, '&amp;')
+                            .replace(/</g, '&lt;')
+                            .replace(/>/g, '&gt;')
+                            .replace(/"/g, '&quot;')
+                            .replace(/'/g, '&#039;');
+                    }
+
+                    function nl2br(text) {
+                        return text.replace(/\n/g, '<br>');
+                    }
+
+                    fetch('{{ url_for("api_raga_description") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ selected_raga: raga })
+                    }).then(resp => resp.json())
+                      .then(data => {
+                          if (data.error) {
+                              container.innerHTML = '<p class="error-message">' + escapeHtml(data.error) + '</p>';
+                              return;
+                          }
+                          const safe = escapeHtml(data.description || 'No description available');
+                          container.innerHTML = '<p>' + nl2br(safe) + '</p>';
+                      }).catch(err => {
+                          container.innerHTML = '<p class="error-message">Failed to load description.</p>';
+                          console.error('Error fetching raga description:', err);
+                      });
+                })();
+            </script>
+        {% endif %}
+    </div>
+{% endblock %}

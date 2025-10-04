@@ -1,0 +1,60 @@
+{% extends "layout.html" %}
+
+{% block title %}Raga Prediction{% endblock %}
+
+{% block content %}
+    <div class="prediction-container">
+        <h1>🎵 Raga </h1>
+<p>
+Raga, in Indian classical music, is a melodic framework for improvisation and composition. 
+Each raga is defined by a unique set of notes, characteristic phrases, and moods 
+that evoke specific emotions such as devotion, love, peace, or energy. 
+Ragas are traditionally performed at particular times of the day or during certain seasons, 
+creating a deep connection between music, nature, and human emotion.
+</p>
+
+    </div>
+
+    <script>
+        document.getElementById('upload-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            // Show the loading spinner
+            const loader = document.getElementById('loading-spinner');
+            const resultDiv = document.getElementById('result');
+            loader.style.display = 'flex';
+            resultDiv.innerHTML = '';
+
+            const formData = new FormData(this);
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Server error occurred');
+                }
+
+                const result = await response.json();
+                loader.style.display = 'none'; // Hide the loader
+
+                // Display the result
+                resultDiv.innerHTML = `
+                    <h3 style="color: #1e3c72;">Predicted Raga: ${result.predicted_label}</h3>
+                    <p><strong>Description:</strong> ${result.description}</p>
+                    <p><strong>Time:</strong> ${result.time}</p>
+                    <p><strong>Mood:</strong> ${result.mood}</p>
+                    <img src="${result.waveform_url}" alt="Waveform">
+                    <img src="${result.spectrogram_url}" alt="Spectrogram">
+                `;
+            } catch (error) {
+                loader.style.display = 'none'; // Hide the loader
+                resultDiv.innerHTML = `
+                    <p style="color: red;">An error occurred: ${error.message}</p>
+                `;
+            }
+        });
+    </script>
+{% endblock %}

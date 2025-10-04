@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Raga Explorer{% endblock %}</title>
+    <style>
+        /* General Layout & Body Styling - Spotify Theme */
+body {
+    font-family: 'Montserrat', 'Arial', sans-serif; /* Spotify uses Montserrat, Arial as fallback */
+    background-color: #121212; /* Spotify's dark background */
+    color: #ffffff; /* White text for contrast */
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 10px 20px;
+    width: 100%;
+}
+
+header {
+    background-color: #000000; /* Even darker for header/nav bar */
+    padding: 15px 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4); /* More subtle shadow on dark */
+    position: sticky; /* Keep header visible */
+    top: 0;
+    z-index: 1000;
+}
+
+.site-title {
+    color: #1DB954; /* Spotify green accent */
+    font-size: 2rem;
+    font-weight: bold;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.site-title:hover {
+    color: #1ED760; /* Brighter green on hover */
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+nav ul li {
+    margin-left: 20px;
+}
+
+nav a {
+    color: #b3b3b3; /* Light gray for general text */
+    text-decoration: none;
+    font-weight: 600; /* Slightly bolder */
+    font-size: 0.95rem;
+    transition: color 0.3s ease, border-bottom 0.3s ease;
+    padding: 5px 0;
+}
+
+nav a:hover {
+    color: #ffffff; /* White on hover */
+    border-bottom: 2px solid #1DB954; /* Spotify green underline */
+}
+
+/* Main Content Area */
+main.container {
+    flex-grow: 1;
+    background-color: #191414; /* Slightly lighter dark background for main content */
+    max-width: 900px;
+    width: 90%;
+    margin: 30px auto;
+    padding: 30px;
+    border-radius: 8px; /* Slightly rounded corners */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    color: #e0e0e0;
+}
+
+/* --- Common Section Styling --- */
+.content-section {
+    padding: 20px;
+    background-color: #282828; /* Card background color */
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #333; /* Subtle border */
+}
+
+.section-title {
+    color: #1DB954; /* Spotify green for main titles */
+    font-size: 2.2rem;
+    margin-bottom: 15px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.section-description {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    text-align: center;
+    color: #b3b3b3;
+}
+
+.result-card {
+    background-color: #282828; /* Card background color */
+    padding: 25px;
+    border-radius: 8px;
+    margin-top: 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    border: 1px solid #333;
+}
+
+.result-title {
+    color: #ffffff; /* White for prominent result titles */
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.result-subtitle {
+    color: #1DB954; /* Spotify green for subtitles */
+    font-size: 1.4rem;
+    margin-top: 25px;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+/* --- Forms & Inputs --- */
+.select-form {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.select-form label {
+    font-size: 1.1rem;
+    margin-right: 10px;
+    color: #ffffff; /* White label text */
+    font-weight: 600;
+}
+
+select {
+    background-color: #333333; /* Darker gray for input backgrounds */
+    color: #ffffff;
+    border: 1px solid #535353; /* Subtle border */
+    border-radius: 4px; /* Slightly rounded for inputs */
+    padding: 10px 15px;
+    font-size: 1rem;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    /* Custom SVG for dropdown arrow - change to white */
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23b3b3b3%22%20d%3D%22M287%2C197.9L146.2%2C57.1L5.4%2C197.9h281.6z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 10px top 50%;
+    background-size: 12px;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+select:hover, select:focus {
+    border-color: #1DB954; /* Green border on hover/focus */
+    background-color: #3a3a3a; /* Slightly lighter on hover */
+    outline: none;
+}
+
+/* Buttons */
+button {
+    background: #1DB954; /* Spotify green button */
+    color: #000000; /* Black text on green button */
+    border: none;
+    padding: 12px 25px; /* Slightly larger padding */
+    border-radius: 500px; /* Fully rounded buttons */
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    margin-top: 15px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+button:hover {
+    background: #1ED760; /* Brighter green on hover */
+    transform: scale(1.02); /* Slight scale up */
+}
+
+/* Expander/Details */
+details {
+    background-color: #282828; /* Same as card background */
+    border-radius: 8px;
+    margin-top: 15px;
+    padding: 15px;
+    transition: background-color 0.3s ease;
+    border: 1px solid #333;
+}
+
+details:hover {
+    background-color: #333333; /* Slightly lighter on hover */
+}
+
+summary {
+    font-weight: bold;
+    cursor: pointer;
+    color: #ffffff; /* White summary text */
+    font-size: 1.1rem;
+    padding: 5px 0;
+    outline: none; /* Remove outline on focus for cleaner look */
+}
+
+summary:hover {
+    color: #1DB954; /* Green on hover */
+}
+
+details p, details ul {
+    margin-top: 10px;
+    line-height: 1.5;
+    color: #b3b3b3;
+}
+
+/* Lists */
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+ul li {
+    margin-bottom: 8px;
+    padding-left: 15px;
+    position: relative;
+    color: #e0e0e0; /* Default list item color */
+}
+
+ul li::before {
+    content: '•';
+    color: #1DB954; /* Spotify green bullet points */
+    font-weight: bold;
+    display: inline-block;
+    width: 1em;
+    margin-left: -1em;
+}
+
+/* Links within content */
+a:not(.site-title):not(nav a) {
+    color: #1DB954; /* Spotify green for content links */
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:not(.site-title):not(nav a):hover {
+    color: #1ED760; /* Brighter green on hover */
+    text-decoration: underline;
+}
+
+/* Error Messages */
+.error-message {
+    color: #FF4D4D; /* A soft red for errors, stands out on dark */
+    font-weight: bold;
+    text-align: center;
+    margin-top: 20px;
+    font-size: 1.1rem;
+}
+
+/* Footer */
+footer {
+    background-color: #000000;
+    color: #535353; /* Darker gray for subtle footer text */
+    text-align: center;
+    padding: 15px 0;
+    margin-top: auto;
+    font-size: 0.9rem;
+}
+
+/* Raga Prediction Specific Styling (from original index.html) */
+.prediction-container {
+    text-align: center;
+    background: #191414; /* Same as main.container for consistency */
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    border: 1px solid #282828;
+}
+
+.prediction-container h1 {
+    color: #1DB954; /* Spotify green for Raga Prediction title */
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+.file-input {
+    margin: 20px auto;
+    display: block;
+    padding: 10px;
+    border: 1px solid #535353;
+    border-radius: 4px;
+    width: calc(100% - 20px);
+    max-width: 400px;
+    box-sizing: border-box;
+    background-color: #333333;
+    color: white;
+}
+/* Style for the file input button itself */
+.file-input::-webkit-file-upload-button {
+    background: #1DB954;
+    color: #000000;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 500px;
+    cursor: pointer;
+    margin-right: 10px;
+    font-weight: bold;
+    transition: background 0.3s ease;
+}
+
+.file-input::-webkit-file-upload-button:hover {
+    background: #1ED760;
+}
+
+
+.result {
+    margin-top: 30px;
+    background-color: #282828;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #333;
+}
+
+.result img {
+    max-width: 100%;
+    height: auto;
+    margin: 15px 0;
+    border-radius: 4px; /* Slightly rounded corners for images */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* Loader Styling - Spotify Green */
+.loader {
+    display: none;
+    margin: 30px auto;
+    justify-content: center;
+    align-items: center;
+}
+
+.loader div {
+    width: 18px;
+    height: 18px;
+    margin: 4px;
+    background: #1DB954; /* Spotify green for loader */
+    border-radius: 50%;
+    display: inline-block;
+    animation: loader 0.8s infinite alternate;
+}
+
+.loader div:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.loader div:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes loader {
+    from {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+    to {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .header-container {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    nav ul {
+        justify-content: center;
+        margin-top: 10px;
+    }
+
+    nav ul li {
+        margin: 0 10px 5px 10px;
+    }
+
+    .site-title {
+        font-size: 1.8rem;
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    nav ul {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    nav ul li {
+        margin: 5px 0;
+    }
+
+    .prediction-container, .content-section {
+        padding: 15px; /* Reduce padding on small screens */
+    }
+    .result-title {
+        font-size: 1.5rem;
+    }
+    button {
+        padding: 10px 20px; /* Smaller buttons on small screens */
+    }
+}
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="/" class="site-title">🎶 Raga Explorer</a>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Raga </a></li>
+                    <li><a href="{{ url_for('raga_finder_by_name') }}">Raga Info (Name)</a></li>
+                    <li><a href="{{ url_for('raga_info') }}">Raga Info (General)</a></li>
+                    <li><a href="{{ url_for('family_insights') }}">Raga Families</a></li>
+                    <li><a href="{{ url_for('mood_recommendation') }}">Raga by Mood</a></li>
+                    <li><a href="{{ url_for('thaat_mapping') }}">Raga-Thaat Mapping</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+    <footer>
+        <p>&copy; 2025 Raga Explorer. All rights reserved.</p>
+    </footer>
+</body>
+</html>
